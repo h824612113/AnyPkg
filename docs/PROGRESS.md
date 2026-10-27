@@ -1,5 +1,12 @@
 # 项目进度
 
+## README 内容精简
+
+- README 仅保留产品介绍、启动与使用说明、三张脱敏功能截图；移除参考项目清单、内部目录/API 结构、开发历程和实验记录。
+- 产物：`README.md`；保留现有截图文件及相对引用，不改动应用代码。
+- 验证：`git diff --check`；检查 README 的三个主要章节、图片文件存在及 PNG 文件头、`npm start` 对应的启动入口与可选依赖安装路径。
+- 未完成项：无功能开发事项；本次仅修改文档，远端状态可用 `git ls-remote origin refs/heads/main` 与 `git rev-parse HEAD` 核对。
+
 ## 2026-10-27：发布到 GitHub
 
 - AnyPkg 根目录已初始化为独立 Git 仓库，并推送到 `git@github.com:h824612113/AnyPkg.git` 的 `main` 分支。
