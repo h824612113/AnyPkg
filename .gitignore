@@ -1,0 +1,16 @@
+.DS_Store
+.playwright-cli/
+.workbuddy/
+.workbuddy-ai/
+.env
+.env.*
+*.secret
+.cache/
+.downloads/
+gplay-server/.venv/
+gplay-server/server.log
+gplay-server/__pycache__/
+__pycache__/
+
+# Legacy standalone checkout; maintained as its own repository.
+gplaydl/

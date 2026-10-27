@@ -1,0 +1,19 @@
+{
+  "name": "anypkg",
+  "version": "1.0.0",
+  "private": true,
+  "description": "任意包 / AnyPkg：输入应用名，聚合检索十余个商店的安装包并直下；同时暴露 MCP 工具给 AI 客户端",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "mcp:smoke": "node scripts/mcp-smoke.js",
+    "test:queue": "node scripts/_test-queue-parts.js",
+    "test:security": "node scripts/test-net-redirect.js",
+    "test:timeout": "node scripts/test-source-timeout.js",
+    "test:bind": "node scripts/test-bind-safety.js",
+    "test:quota": "node scripts/test-download-quota.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

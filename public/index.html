@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>任意包 · 全平台应用搜索与下载</title>
+<meta name="description" content="输入应用名字，一次找到 iOS / Android / Windows / macOS / Linux 各平台的安装包。">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233d5afe'/%3E%3Cpath d='M16 7v12m0 0 5-5m-5 5-5-5M9 24h14' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="22" height="22"><path d="M16 6v13m0 0 5.5-5.5M16 19l-5.5-5.5M8 24.5h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </span>
+      <span class="brand-name">任意包</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-en">AnyPkg</span>
+    </div>
+
+    <h1>输入名字，找到它<span class="hl">在每个平台</span>的安装包</h1>
+    <p class="lede">并行检索 App Store（默认五个区一起搜，同一个 App 只出一张卡）、Google Play、应用宝、Aptoide、F-Droid、IzzyOnDroid、APKPure、Winget、Snapcraft、Flathub、Homebrew Cask、GitHub Releases、Steam，能直下的直接下，需要账号或商店的给出入口；多选几个丢进下载队列，下完可以直接装到连着的手机。</p>
+
+    <form class="searchbar" id="search-form" autocomplete="off">
+      <span class="search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <input id="q" name="q" type="search" placeholder="应用名，例如：微信 / Figma / OBS / 原神" spellcheck="false" aria-label="应用名称">
+      <select id="store" class="store-select" aria-label="App Store 区域" title="App Store 区域：只影响 Apple 两栏的检索目录。选「全部区」会并行搜五个区，同一个 App 只出一张卡并标出上架区；下载仍受你账号所在区限制">
+        <option value="all" selected>全部区</option>
+        <option value="cn">中国区</option>
+        <option value="us">美国区</option>
+        <option value="jp">日本区</option>
+        <option value="hk">中国香港区</option>
+        <option value="tw">中国台湾区</option>
+      </select>
+      <button type="submit" id="go">搜索</button>
+    </form>
+
+    <div class="suggest" id="suggest">
+      <span class="suggest-label">试试</span>
+      <button class="chip-mini" data-q="微信">微信</button>
+      <button class="chip-mini" data-q="抖音">抖音</button>
+      <button class="chip-mini" data-q="Figma">Figma</button>
+      <button class="chip-mini" data-q="obs">OBS</button>
+      <button class="chip-mini" data-q="原神">原神</button>
+      <button class="chip-mini" data-q="奶茶人">奶茶人</button>
+    </div>
+
+    <div class="bars">
+      <div class="playbar" id="playbar" hidden>
+        <span class="playbar-dot" aria-hidden="true"></span>
+        <span class="playbar-text" id="playbar-text">Google Play</span>
+        <button class="playbar-btn ghostbtn" id="playbar-direct" type="button">直下 APK</button>
+        <button class="playbar-btn" id="playbar-btn" type="button">连接账号</button>
+      </div>
+
+      <div class="playbar" id="applebar" hidden>
+        <span class="playbar-dot" aria-hidden="true"></span>
+        <span class="playbar-text" id="applebar-text">App Store</span>
+        <button class="playbar-btn ghostbtn" id="applebar-ipa" type="button">提取 IPA</button>
+        <button class="playbar-btn ghostbtn" id="applebar-accts" type="button">多账号</button>
+        <button class="playbar-btn" id="applebar-btn" type="button">连接账号</button>
+      </div>
+
+      <div class="playbar" id="devicebar" hidden>
+        <span class="playbar-dot" aria-hidden="true"></span>
+        <span class="playbar-text" id="devicebar-text">设备</span>
+        <select class="device-select" id="device-select" aria-label="选择要安装到的设备" hidden></select>
+        <button class="playbar-btn" id="devicebar-btn" type="button">刷新</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="statusbar" class="statusbar" hidden></section>
+
+  <section id="filters" class="filters" hidden></section>
+
+  <section id="results" class="results" aria-live="polite">
+    <div class="empty">
+      <div class="empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="56" height="56"><rect x="8" y="12" width="48" height="40" rx="7" stroke="currentColor" stroke-width="2.5" fill="none" opacity=".35"/><path d="M32 22v16m0 0 6-6m-6 6-6-6M20 44h24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".7"/></svg>
+      </div>
+      <h2>还没有搜索</h2>
+      <p>输入一个应用名，会并行查询应用商店与开源仓库，把各平台的安装包汇总到一起。</p>
+    </div>
+  </section>
+
+  <section id="deeplinks" class="panel" hidden>
+    <div class="panel-head">
+      <h2>其他平台入口</h2>
+      <p>这些平台没有公开检索 API，点进去直达它的搜索结果页。</p>
+    </div>
+    <div class="linkgrid" id="linkgrid"></div>
+  </section>
+
+  <section class="panel" id="tools" hidden>
+    <div class="panel-head">
+      <h2>本机直下工具</h2>
+      <p>这些工具跑在你自己的电脑上、用你自己的账号，所以能拿到网页接口拿不到的包。装上之后，对应的卡片会多出一个下载按钮。</p>
+    </div>
+    <div class="toollist" id="toollist"></div>
+  </section>
+
+  <section class="panel note" id="ipa-note">
+    <div class="panel-head">
+      <h2>关于 iOS / macOS 的安装包</h2>
+    </div>
+    <div class="note-body">
+      <p><strong>Apple 不提供任何公开的 IPA 下载接口。</strong>App Store 的分发协议要求安装包只能由 App Store 客户端在用户本人 Apple ID 授权下解密安装，所以网页这边默认给 iOS 的结果是 App Store 页面链接，而不是 <code>.ipa</code> 文件。</p>
+      <p>要在这个页面里直接拿到包，就走本机 ipatool 这条路：</p>
+      <pre><code>brew install ipatool   # 装好之后刷新页面，顶部会多出 App Store 状态条</code></pre>
+      <p>点顶部的「连接账号」，用你自己的 Apple ID 登录（含两步验证），之后 iOS 与 Mac App Store 的卡片上会出现「下载 IPA / PKG」。可以选设备（iPhone / iPad / Mac / Apple TV / Watch / Vision Pro），也能挑历史版本。凭证由 ipatool 存在本机 keychain，密码只在本机内存里过一次。</p>
+      <p>如果你手上已经有一个<strong>第三方分发页</strong>（企业签名自建 OTA、内测分发平台、自己的 itms-services 链接），点顶部「提取 IPA」把链接粘进去，就能直接拿到里面的 <code>.ipa</code> 地址、包名和版本——这条路不需要 Apple ID，因为它只是解析页面里已经公开的 OTA 清单。</p>
+      <p>几点得先说清楚：</p>
+      <ul>
+        <li><strong>包是加密的</strong>：下到的 IPA 仍是 FairPlay 加密、并绑在你的账号上，只能装到你本人登录同一 Apple ID 的设备（配合 Apple Configurator / iMazing 之类），不能当成破解包分发。</li>
+        <li><strong>只能下免费或你已购买的应用</strong>：免费应用会自动领许可；付费的必须先在 App Store 里买过。</li>
+        <li><strong>部分应用不开放下载</strong>：开发者可以选择不提供给第三方客户端，这类会直接报错。</li>
+      </ul>
+      <p class="muted">第三方「IPA 库」站点分发的是破解 / 重签包，属于侵权且常被注入恶意代码，本工具不做聚合。</p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>任意包 · 本地运行，不落库、不留搜索记录</span>
+    <span id="foot-stat"></span>
+  </footer>
+
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h3 id="modal-title">Google Play</h3>
+      <button class="modal-x" id="modal-x" type="button" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="queuebar" id="queuebar" hidden>
+  <div class="queue-head">
+    <span class="queue-dot" aria-hidden="true"></span>
+    <span class="queue-title" id="queue-title">下载队列</span>
+    <button class="queue-mini" id="queue-clear" type="button" hidden>清空</button>
+    <button class="queue-mini queue-toggle" id="queue-toggle" type="button" aria-expanded="false">展开</button>
+  </div>
+  <div class="queue-list" id="queue-list" hidden></div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
