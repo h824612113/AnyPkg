@@ -1,5 +1,20 @@
 # 项目进度
 
+## 2026-10-27：发布到 GitHub
+
+- AnyPkg 根目录已初始化为独立 Git 仓库，并推送到 `git@github.com:h824612113/AnyPkg.git` 的 `main` 分支。
+- 初始功能提交：`3e5e45b`（`feat: publish AnyPkg application package aggregator`）；后续文档同步提交见远端历史。
+- 提交包含源码、测试、README 功能截图和 Google Play 旁路所需公开资源；本机下载包、缓存、虚拟环境、工作记忆、日志、凭证文件和独立的 `gplaydl/` 子仓库均未提交。
+
+### 验证命令
+
+```bash
+git status --short --branch
+git ls-remote origin refs/heads/main
+```
+
+期望结果：工作区干净；远端 `main` 指向本地最新提交。
+
 ## 2026-10-27：README 功能截图
 
 - 使用隔离的 Playwright 浏览器生成 README 截图：`output/playwright/search-results.png`、`output/playwright/direct-downloads.png`、`output/playwright/download-queue.png`。
